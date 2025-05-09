@@ -39,7 +39,6 @@ class TestMoviesAPI:
         assert data_film["description"] == "Тестовое описание", "description is not Тестовое описание"
         assert data_film["genreId"] == 1, "genreId is not 1"
         assert data_film["imageUrl"] == "https://image.url", "imageUrl is not correct"
-
         response = api_manager.movies_api.delete_movie(id_film)
         get_film = api_manager.movies_api.get_movies_by_id(movie_id=id_film,expected_status=404)
 
@@ -48,8 +47,8 @@ class TestMoviesAPI:
         response2 = api_manager.movies_api.create_movie(movie_data=data_film, expected_status=409)
         assert response2.status_code == 409, "status_code is not 409"
         id_film = response1.json().get("id")
-        response = api_manager.movies_api.delete_movie(id_film)
-        get_film = api_manager.movies_api.get_movies_by_id(movie_id=id_film, expected_status=404)
+        api_manager.movies_api.delete_movie(id_film)
+        api_manager.movies_api.get_movies_by_id(movie_id=id_film, expected_status=404)
 
     def test_negative_min_post(self, api_manager, data_film_min):
         response = api_manager.movies_api.create_movie(movie_data=data_film_min)

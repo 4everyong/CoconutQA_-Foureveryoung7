@@ -12,13 +12,6 @@ class MoviesAPI(CustomRequester):
             endpoint="/movies"
         )
 
-    def get_movies_by_id(self, movie_id):
-        return self.send_request(
-            method="GET",
-            endpoint=f"/movies?{movie_id}",
-
-        )
-
     def get_movies_filter(self, movie_filter):
         return self.send_request(
             method="GET",

@@ -1,5 +1,5 @@
 from constants import BASE_URL
-import requests
+
 
 class CustomRequester:
     base_headers = {

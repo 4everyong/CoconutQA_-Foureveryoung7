@@ -1,7 +1,7 @@
 import random
 import string
 from faker import Faker
-fake = Faker("ru_RU")
+fake = Faker()
 
 
 class DataGenerator:

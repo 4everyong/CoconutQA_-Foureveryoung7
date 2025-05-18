@@ -1,15 +1,18 @@
-from constants import BASE_URL
+from constants.constants import BASE_URL
 from custom_requester.custom_requester import CustomRequester
 
 
 class MoviesAPI(CustomRequester):
-    def __init__(self, session):
-        super().__init__(session=session, base_url=BASE_URL)
+    MOVIE_BASE_URL = "https://api.dev-cinescope.coconutqa.ru/"
 
-    def get_movies(self):
+    def __init__(self, session):
+        super().__init__(session=session, base_url=self.MOVIE_BASE_URL)
+
+    def get_movies(self, params=None):
         return self.send_request(
             method="GET",
-            endpoint="/movies"
+            endpoint="movies",
+            params=params
         )
 
     def get_movies_filter(self, movie_filter):

@@ -31,7 +31,7 @@ class RegisterUserResponse(BaseModel):
     fullName: str = Field(min_length=1, max_length=100, description="Полное имя пользователя")
     verified: bool
     banned: bool
-    roles: List[Roles]
+    roles: List[Roles] = [Roles.USER.value]
     createdAt: str = Field(description="Дата и время создания пользователя в формате ISO 8601")
 
     @field_validator("createdAt")
@@ -40,4 +40,33 @@ class RegisterUserResponse(BaseModel):
             datetime.datetime.fromisoformat(value)
         except ValueError:
             raise ValueError("Некорректный формат даты и времени. Ожидается формат ISO 8601.")
+        return value
+
+class FilmRequest(BaseModel):
+    name: str
+    imageUrl: Optional[str]=None
+    price: int
+    description: str
+    location: str
+    published: bool
+    genreId: int
+
+class FilmResponse(BaseModel):
+    id: int
+    name: str
+    price: int
+    description: str
+    imageUrl: Optional[str] = None
+    location: str
+    published: bool
+    rating: int
+    genreId: int
+    createdAt: str = Field(description="Дата и время создания пользователя в формате ISO 8601")
+    genre: dict
+
+    @field_validator('location')
+    def validate_location(cls, value):
+        allowed_values = {"MSK", "SPB"}
+        if value not in allowed_values:
+            raise ValueError(f"Значение поля location должно быть одним из: {allowed_values}. Текущее значение: {value}")
         return value

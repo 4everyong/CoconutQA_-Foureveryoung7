@@ -39,17 +39,16 @@ class CustomRequester:
         :return: Объект ответа requests.Response.
         """
         url = f"{self.base_url}{endpoint}"
-        response = self.session.request(method, url, json=data)
+
+        if isinstance(data, BaseModel):
+            data = json.loads(data.model_dump_json(exclude_unset=True))
+        response = self.session.request(method, url, json=data, params=params)
 
         if need_logging:
             self.log_request_and_response(response)
 
         if response.status_code != expected_status:
             raise ValueError(f"Unexpected status code: {response.status_code}. Expected: {expected_status}")
-
-        if isinstance(data, BaseModel):
-            data = json.loads(data.model_dump_json(exclude_unset=True))
-        response = self.session.request(method, url, json=data, params=params)
 
         return response
 

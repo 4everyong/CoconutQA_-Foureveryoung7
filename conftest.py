@@ -1,18 +1,18 @@
 import json
-from typing import Any
-
 import pytest
 import requests
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from api.api_manager import ApiManager
 from constants.roles import Roles
 from entities.user import User
-from models.base_models import TestUser
+from models.base_models import TestUser, FilmRequest, FilmResponse
 from resources.user_creds import SuperAdminCreds
 from utils.data_generator import DataGenerator
 
 
 @pytest.fixture
-def test_user():
+def test_user() -> TestUser:
     random_password = DataGenerator.generate_random_password()
     return TestUser(
         email=DataGenerator.generate_random_email(),
@@ -23,7 +23,7 @@ def test_user():
     )
 
 @pytest.fixture(scope="function")
-def creation_user_data(test_user):
+def creation_user_data(test_user) -> TestUser:
     updated_data = json.loads(test_user.model_dump_json())
     updated_data.update({
         "verified": True,
@@ -43,53 +43,40 @@ def api_manager(session):
 
 @pytest.fixture(scope='function')
 def data_film():
-    film_name = DataGenerator.generate_random_film()
-    film_image_url = DataGenerator.generate_random_image_url()
-    price = DataGenerator.generate_random_price()
-    description = DataGenerator.generate_random_description()
-    location = DataGenerator.generate_random_location()
-    published = DataGenerator.generate_random_published()
-    genre_id = DataGenerator.generate_random_genre_id()
-    return {
-          "name": film_name,
-          "imageUrl": film_image_url,
-          "price": price,
-          "description": description,
-          "location": location,
-          "published": published,
-          "genreId": genre_id
-        }
+    return FilmRequest (
+          name=DataGenerator.generate_random_film(),
+          imageUrl=DataGenerator.generate_random_image_url(),
+          price=DataGenerator.generate_random_price(),
+          description=DataGenerator.generate_random_description(),
+          location=DataGenerator.generate_random_location(),
+          published=DataGenerator.generate_random_published(),
+          genreId=DataGenerator.generate_random_genre_id()
+    )
 
 @pytest.fixture(scope='function')
 def data_film_min():
-    film_name = DataGenerator.generate_random_film()
-    price = DataGenerator.generate_random_price()
-    description = DataGenerator.generate_random_description()
-    location = DataGenerator.generate_random_location()
-    published = DataGenerator.generate_random_published()
-    genre_id = DataGenerator.generate_random_genre_id()
-    return {
-        "name": film_name,
-        "price": price,
-        "description": description,
-        "location": location,
-        "published": published,
-        "genreId": genre_id
-    }
+    return FilmRequest(
+        name=DataGenerator.generate_random_film(),
+        price=DataGenerator.generate_random_price(),
+        description=DataGenerator.generate_random_description(),
+        location=DataGenerator.generate_random_location(),
+        published=DataGenerator.generate_random_published(),
+        genreId=DataGenerator.generate_random_genre_id()
+    )
 
 @pytest.fixture(scope="function")
-def create_delete_film(data_film, super_admin):
+def create_delete_film(data_film: FilmRequest, super_admin) -> FilmResponse:
     response = super_admin.api.movies_api.create_movie(movie_data=data_film)
-    response_data= response.json()
-    id_film = response_data.get("id")
+    response_data= FilmResponse(**response.json())
+    id_film = response_data.id
     yield response_data
     super_admin.api.movies_api.delete_movie(id_film)
     super_admin.api.movies_api.get_movies_by_id(movie_id=id_film, expected_status=404)
 
 @pytest.fixture(scope="function")
-def create_film(data_film, super_admin):
+def create_film(data_film: FilmRequest, super_admin):
     response = super_admin.api.movies_api.create_movie(movie_data=data_film)
-    return response.json()
+    return FilmResponse(**response.json())
 
 @pytest.fixture
 def user_session():
@@ -132,3 +119,25 @@ def common_user(user_session, super_admin, creation_user_data):
     super_admin.api.user_api.create_user(creation_user_data)
     common_user.api.auth_api.authenticate(common_user.creds)
     return common_user
+
+HOST = "92.255.111.76"
+PORT = 31200
+DATABASE_NAME = "db_movies"
+USERNAME = "postgres"
+PASSWORD = "AmwFrtnR2"
+
+engine = create_engine(f"postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE_NAME}") # Создаем движок (engine) для подключения к базе данных
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # Создаем фабрику сессий
+
+@pytest.fixture(scope="module")
+def db_session():
+    """
+    Фикстура, которая создает и возвращает сессию для работы с базой данных.
+    После завершения теста сессия автоматически закрывается.
+    """
+    # Создаем новую сессию
+    db_session = SessionLocal()
+    # Возвращаем сессию в тест
+    yield db_session
+    # Закрываем сессию после завершения теста
+    db_session.close()

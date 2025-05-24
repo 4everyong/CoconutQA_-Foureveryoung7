@@ -35,6 +35,17 @@ class MovieDBModel(Base):
     published = Column(Boolean)  # Опубликован ли фильм
     created_at = Column(DateTime)  # Дата создания записи
 
+class ReviewsDBModel(Base):
+    __tablename__ = "reviews"
+
+    movie_id = Column(Integer, primary_key=True)
+    user_id = Column(String)
+    hidden = Column(Boolean)
+    text = Column(String)
+    rating = Column(Integer)
+    created_at = Column(DateTime)
+
+
 class AccountTransactionTemplate(Base):
     __tablename__ = 'accounts_transaction_template'
     user = Column(String, primary_key=True)

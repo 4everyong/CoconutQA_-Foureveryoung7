@@ -13,6 +13,11 @@ class DataGenerator:
         return f"Фильм {random_string}"
 
     @staticmethod
+    def generate_reviews():
+        random_string = ''.join(random.choices(string.ascii_lowercase, k=40))
+        return random_string
+
+    @staticmethod
     def generate_random_image_url():
         return fake.uri()
 

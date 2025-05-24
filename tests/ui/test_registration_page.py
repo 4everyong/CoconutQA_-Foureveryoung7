@@ -2,7 +2,7 @@ import time
 import allure
 import pytest
 from playwright.sync_api import sync_playwright
-from models.page_object_models import CinescopeRegisterPage
+from pages.page_register import CinescopeRegisterPage
 from utils.data_generator import DataGenerator
 
 

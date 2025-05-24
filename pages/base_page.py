@@ -10,8 +10,8 @@ class BasePage(PageAction): #Базовая логика доспустимая 
         self.home_url = "https://dev-cinescope.coconutqa.ru/"
 
         # Общие локаторы для всех страниц на сайте
-        self.home_button = "a[href='/' and text()='Cinescope']"
-        self.all_movies_button = "a[href='/movies' and text()='Все фильмы']"
+        self.home_button = self.page.get_by_role("link", name="Cinescope")
+        self.all_movies_button = self.page.get_by_role("link", name="Все фильмы")
 
     @allure.step("Переход на главную страницу, из шапки сайта")
     def go_to_home_page(self):

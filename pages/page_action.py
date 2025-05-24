@@ -1,5 +1,5 @@
 import allure
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 
 class PageAction:
@@ -13,6 +13,9 @@ class PageAction:
     @allure.step("Ввод текста '{text}' в поле '{locator}'")
     def enter_text_to_element(self, locator, text: str):
         locator.fill(text)
+
+    def check_element(self, locator, text: str):
+        expect(locator).to_contain_text(text)
 
     @allure.step("Клик по элементу '{locator}'")
     def click_element(self, locator):

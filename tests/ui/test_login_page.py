@@ -1,10 +1,9 @@
 import time
-
 import allure
 import pytest
 from playwright.sync_api import sync_playwright
 from conftest import common_user
-from models.page_object_models import CinescopLoginPage
+from pages.page_login import CinescopLoginPage
 
 
 @allure.epic("Тестирование UI")
